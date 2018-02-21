@@ -260,10 +260,10 @@ function RubiconModule(configs) {
                 try {
                 var _window = window.top;
                 } catch(e) {
-                    console.log("impossible to reach top window")
+                    console.log("impossible to reach top window");
                 }
             } else {
-                _window = window
+                var _window = window;
             }
             var digiTrustUser = _window.DigiTrust && _window.DigiTrust.getUser({member: 'T9QSFKPDN9'});
             return (digiTrustUser && digiTrustUser.success && digiTrustUser.identity) || null;
@@ -271,7 +271,7 @@ function RubiconModule(configs) {
         var digiTrustId = getDigiTrustId();
         // Verify there is an ID and this user has not opted out
         if (!digiTrustId || (digiTrustId.privacy && digiTrustId.privacy.optout)) {
-        return [];
+        return {};
         }
         var _dt = {
             id: digiTrustId.id,
