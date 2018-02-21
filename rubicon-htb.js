@@ -254,6 +254,32 @@ function RubiconModule(configs) {
         return firstPartyData;
     }
 
+    function _getDigiTrustQueryParams() {
+        function getDigiTrustId() {
+            if (!Browser.isTopFrame()) {
+                try {
+                var _window = window.top;
+                } catch(e) {
+                    console.log("impossible to reach top window")
+                }
+            } else {
+                _window = window
+            }
+            var digiTrustUser = _window.DigiTrust && _window.DigiTrust.getUser({member: 'T9QSFKPDN9'});
+            return (digiTrustUser && digiTrustUser.success && digiTrustUser.identity) || null;
+        }
+        var digiTrustId = getDigiTrustId();
+        // Verify there is an ID and this user has not opted out
+        if (!digiTrustId || (digiTrustId.privacy && digiTrustId.privacy.optout)) {
+        return [];
+        }
+        var _dt = {
+            id: digiTrustId.id,
+            keyv: digiTrustId.keyv,
+            pref: 0
+        }
+        return _dt;
+    }    
     /**
      * Generates the request URL to the endpoint for the xSlots in the given
      * returnParcels.
@@ -363,7 +389,8 @@ function RubiconModule(configs) {
             zone_id: parcel.xSlotRef.zoneId, //jshint ignore:line
             kw: 'rp.fastlane',
             tk_flint: 'custom', //jshint ignore:line
-            rand: Math.random()
+            rand: Math.random(),
+            dt: _getDigiTrustQueryParams()
         };
 
         for (var pageInv in pageFirstPartyData.inventory) {
